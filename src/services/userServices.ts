@@ -13,11 +13,11 @@ const userRegister = async (payload: Payload) => {
 		const user = await prismaClient.user.create({
 			data: {
 				username: payload.username,
-				password: payload.password				
-			},
+				password: payload.password,									
+			},			
 		});
     
-		await setUserRoles(user, payload.roles);
+		// await setUserRoles(user, payload.roles);
 
 		return user;
 	} catch (e) {
@@ -51,4 +51,24 @@ const setUserRoles = async (user: User, roles: any) => {
 	}
 };
 
-export { userRegister, setUserRoles };
+const listUserByRoles = async (role: string) => {
+	try {
+		const users = await prismaClient.user.findMany({
+			where: {
+				roles: {
+					some: {
+						role: {
+							name: role
+						}
+					}
+				}
+			}
+		});
+		return users;
+	} catch (e) {
+		const err = e as Error;
+		throw new Error(err.message);
+	}
+}
+
+export { userRegister, setUserRoles, listUserByRoles };
